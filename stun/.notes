@@ -1,0 +1,7 @@
+
+Problem:
+If peer connects to rendez-vous server & listens on the port of connection, it will change each time it connects
+Solve:
+Set port from the first connection to rendez-vous server to lpeer port. And, always use it when you connect.
+
+
