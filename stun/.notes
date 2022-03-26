@@ -1,7 +1,19 @@
 
 Problem:
 If peer connects to rendez-vous server & listens on the port of connection, it will change each time it connects
-Solve:
+Solution:
 Set port from the first connection to rendez-vous server to lpeer port. And, always use it when you connect.
+
+
+==== REGISTRATION ====
+*Messages are always encrypted with pre-set AES_key when talking with rendezvous server
+
+1. A connects to rendezvous server (S)
+2. S registers A's public & private endpoint
+- Public endpoint: Public Ip address, public source udp port
+- Private endpoint: Private Ip address, private source udp port
+- S gets private endpoint from the A
+3. S sendes to A its endpoints
+4. Keep-Alive
 
 
