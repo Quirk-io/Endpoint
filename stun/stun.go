@@ -51,7 +51,7 @@ func Reg() RegMsg{
 }
 
 
-func Udp() (*net.UDPConn, Endpoints) {
+func Udp(AES_key string) (*net.UDPConn, Endpoints) {
 	signalsrv, _ := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%s", signal_ip, signal_port))
 	localaddr, _ := net.ResolveUDPAddr("udp", ":1691")
 
