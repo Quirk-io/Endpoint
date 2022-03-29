@@ -3,9 +3,6 @@ package main
 
 import ("log"
 	"net"
-	"fmt"
-	"encoding/json"
-	qpeer "github.com/Quirk-io/go-qPeer/qpeer"
 )
 
 func Udp_Rendezvous(AES_key string) (*net.UDPConn, Endpoints){
@@ -21,15 +18,15 @@ func Udp_Rendezvous(AES_key string) (*net.UDPConn, Endpoints){
 	for {
     	buffer := make([]byte, 2048)
 		
-		n, read_err := conn.Read(buffer)
+		n, public_endpoint,read_err := srv.ReadFromUDP(buffer)
 		if read_err != nil {
 			log.Fatal(read_err)
 		}
 		
-		regmsg := buffer[:n]
-		
+		kenc_regmsg := buffer[:n]
+		regmsg := Dkenc_Regmsg(AES_key, string(kenc_regmsg))
+
   	}
-  }
 
 }
 
