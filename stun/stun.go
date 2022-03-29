@@ -41,13 +41,28 @@ func GetPrivateIp() string {
     return string(localAddr)
 }
 
-func Reg() RegMsg{
+func Reg() RegMsg{ //Register msg
 	privendpoint := Endpoint{GetPrivateIp(), "1691"}
 	jsonified_privendpoint, _ := json.Marshal(privendpoint)
 
 	reg_msg := RegMsg{"reg", string(jsonified_privendpoint)}
 
 	return reg_msg
+}
+
+func Kenc_Regmsg(AES_key string) string{
+	jsonified_regmsg, _ := json.Marshal(Reg())
+	kenc_regmsg := qpeer.AES_encrypt(string(jsonified_regmsg), AES_key)
+
+	return kenc_regmsg
+}
+
+func Dkenc_Regmsg(AES_key string, kenc_regmsg string) string{
+	jsonified_regmsg := qpeer.AES_decrypt(kenc_regmsg, AES_key)
+	var regmsg RegMsg
+	json.Unmarshal(jsonified_regmsg, &regmsg)
+
+	return regmsg
 }
 
 
@@ -60,10 +75,9 @@ func Udp(AES_key string) (*net.UDPConn, Endpoints) {
 	if err != nil{
 		log.Fatal(err)
 	}
-	defer l.Close()
 	
-	jsonified_regmsg, _ := json.Marshal(Reg())
-	_, err = l.WriteToUDP([]byte(qpeer.AES_encrypt(string(jsonified_regmsg), AES_key)), signalsrv)
+	
+	_, err = l.WriteToUDP([]byte(Kenc_Regmsg(AES_key)), signalsrv)
 	if err != nil{
 		log.Fatal(err)
 	}
