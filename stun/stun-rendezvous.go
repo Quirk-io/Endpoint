@@ -18,5 +18,18 @@ func Udp_Rendezvous(AES_key string) (*net.UDPConn, Endpoints){
 	}
 	defer srv.Close()
 
+	for {
+    	buffer := make([]byte, 2048)
+		
+		n, read_err := conn.Read(buffer)
+		if read_err != nil {
+			log.Fatal(read_err)
+		}
+		
+		regmsg := buffer[:n]
+		
+  	}
+  }
+
 }
 

@@ -5,6 +5,7 @@ import ("log"
 	"net"
 	"fmt"
 	"encoding/json"
+	"encoding/base64"
 	qpeer "github.com/Quirk-io/go-qPeer/qpeer"
 )
 
@@ -52,19 +53,38 @@ func Reg() RegMsg{ //Register msg
 
 func Kenc_Regmsg(AES_key string) string{
 	jsonified_regmsg, _ := json.Marshal(Reg())
-	kenc_regmsg := qpeer.AES_encrypt(string(jsonified_regmsg), AES_key)
+	kenc_regmsg := base64.StdEncoding.EncodeToString([]byte(qpeer.AES_encrypt(string(jsonified_regmsg), AES_key)))
 
 	return kenc_regmsg
 }
 
-func Dkenc_Regmsg(AES_key string, kenc_regmsg string) string{
-	jsonified_regmsg := qpeer.AES_decrypt(kenc_regmsg, AES_key)
+func Dkenc_Regmsg(AES_key string, kenc_regmsg string) RegMsg{
+	b64dec_regmsg, _ := base64.StdEncoding.DecodeString(kenc_regmsg)
+	jsonified_regmsg := qpeer.AES_decrypt(string(b64dec_regmsg), AES_key)
+
 	var regmsg RegMsg
-	json.Unmarshal(jsonified_regmsg, &regmsg)
+	json.Unmarshal([]byte(jsonified_regmsg), &regmsg)
 
 	return regmsg
 }
 
+func Kenc_Endpoints(AES_key string, endpoints Endpoints) string{
+	jsonified_endpoints, _ := json.Marshal(endpoints)
+	kenc_endpoints := base64.StdEncoding.EncodeToString([]byte(qpeer.AES_encrypt(string(jsonified_endpoints), AES_key)))
+
+	return kenc_endpoints
+}
+
+func Dkenc_Endpoints(AES_key string, kenc_endpoints string) Endpoints{
+	b64dec_endpoints, _ := base64.StdEncoding.DecodeString(kenc_endpoints)
+	jsonified_endpoints := qpeer.AES_decrypt(string(b64dec_endpoints), AES_key)
+
+	var endpoints Endpoints
+	json.Unmarshal([]byte(jsonified_endpoints), &endpoints)
+
+	return endpoints
+
+}
 
 func Udp(AES_key string) (*net.UDPConn, Endpoints) {
 	signalsrv, _ := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%s", signal_ip, signal_port))
@@ -75,7 +95,6 @@ func Udp(AES_key string) (*net.UDPConn, Endpoints) {
 	if err != nil{
 		log.Fatal(err)
 	}
-	
 	
 	_, err = l.WriteToUDP([]byte(Kenc_Regmsg(AES_key)), signalsrv)
 	if err != nil{
@@ -91,8 +110,7 @@ func Udp(AES_key string) (*net.UDPConn, Endpoints) {
 	
 	recvd := buffer[:n]
 
-	var endpoints Endpoints
-	json.Unmarshal([]byte(qpeer.AES_decrypt(string(recvd), AES_key)), &endpoints)
+	endpoints := Dkenc_Endpoints(AES_key, string(recvd))
 
 	return l, endpoints
 }
