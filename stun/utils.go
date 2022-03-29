@@ -52,7 +52,7 @@ func Reg() RegMsg{ //Register msg
 
 func ImportPrivateEndpoint(jsonified_privendpoint string) Endpoint{ //From json to Endpoint
 	var endpoint Endpoint
-	json.Unmarshal(jsonified_privendpoint, &endpoint)
+	json.Unmarshal([]byte(jsonified_privendpoint), &endpoint)
 
 	return endpoint
 }

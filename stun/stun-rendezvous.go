@@ -3,6 +3,7 @@ package main
 
 import ("log"
 	"net"
+	"strconv"
 )
 
 func Udp_Rendezvous(AES_key string) (*net.UDPConn, Endpoints){
@@ -27,11 +28,16 @@ func Udp_Rendezvous(AES_key string) (*net.UDPConn, Endpoints){
 		regmsg := Dkenc_Regmsg(AES_key, string(kenc_regmsg))
 
 		private_endpoint := ImportPrivateEndpoint(regmsg.PrivateEndpoint)
-		public_endpoint := Endpoint{public_addr.IP.String(), public_addr.Port}
+		public_endpoint := Endpoint{public_addr.IP.String(), strconv.Itoa(public_addr.Port)}
 
 		endpoints := Endpoints{public_endpoint, private_endpoint}
-		
-  	}
 
+		kenc_endpoints := Kenc_Endpoints(AES_key, endpoints)
+
+		_, err = srv.WriteToUDP([]byte(kenc_endpoints), public_addr)
+		if err != nil{
+			log.Fatal(err)
+		}
+  	}
 }
 
