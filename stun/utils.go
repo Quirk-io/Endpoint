@@ -20,8 +20,8 @@ type Endpoint struct{
 }
 
 type RegMsg struct{
-	Msgtype string `json:"msgtype"`
-	PrivateEndpoint string `json:"privendpoint"`
+	Msgtype string 
+	PrivateEndpoint string
 }
 
 const (
@@ -45,12 +45,19 @@ func Reg() RegMsg{ //Register msg
 	privendpoint := Endpoint{GetPrivateIp(), "1691"}
 	jsonified_privendpoint, _ := json.Marshal(privendpoint)
 
-	reg_msg := RegMsg{"reg", string(jsonified_privendpoint)}
+	regmsg := RegMsg{"reg", string(jsonified_privendpoint)}
 
-	return reg_msg
+	return regmsg
 }
 
-func Kenc_Regmsg(AES_key string) string{
+func ImportPrivateEndpoint(jsonified_privendpoint string) Endpoint{ //From json to Endpoint
+	var endpoint Endpoint
+	json.Unmarshal(jsonified_privendpoint, &endpoint)
+
+	return endpoint
+}
+
+func Kenc_Regmsg(AES_key string) string{ //Encrypting Regmsg with AES_key
 	jsonified_regmsg, _ := json.Marshal(Reg())
 	kenc_regmsg := base64.StdEncoding.EncodeToString([]byte(qpeer.AES_encrypt(string(jsonified_regmsg), AES_key)))
 
