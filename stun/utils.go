@@ -10,8 +10,8 @@ import (
 )
 
 type Endpoints struct{
-	PublicEndpoint Endpoint
-	PrivateEndpoint Endpoint
+	PublicEndpoint Endpoint `json:"PublicEndpoint"`
+	PrivateEndpoint Endpoint `json:"PrivateEndpoint"`
 }
 
 type Endpoint struct{
