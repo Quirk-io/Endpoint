@@ -24,12 +24,6 @@ type RegMsg struct{
 	PrivateEndpoint string
 }
 
-const (
-	signal_ip = ""
-	signal_port = ""
-	AES_key = ""
-)
-
 func GetPrivateIp() string {
     conn, err := net.Dial("udp", "8.8.8.8:80")
     if err != nil {
