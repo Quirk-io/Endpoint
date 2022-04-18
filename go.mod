@@ -1,4 +1,3 @@
-module github.com/Quirk-io/Endpoint
+module github.com/quirkio/Endpoint
 
 go 1.13
-

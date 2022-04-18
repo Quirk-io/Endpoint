@@ -11,8 +11,8 @@ import (
 )
 
 type Endpoints struct{
-	PublicEndpoint Endpoint `json:"PublicEndpoint"`
-	PrivateEndpoint Endpoint `json:"PrivateEndpoint"`
+	PublicEndpoint Endpoint
+	PrivateEndpoint Endpoint
 }
 
 type Endpoint struct{
@@ -76,7 +76,7 @@ func GetPrivateIp() string {
     defer conn.Close()
 
     localAddr := conn.LocalAddr().(*net.UDPAddr).IP
-    return string(localAddr)
+    return localAddr.String()
 }
 
 func Reg() RegMsg{ //Register msg

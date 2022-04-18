@@ -6,8 +6,8 @@ import ("log"
 	"strconv"
 )
 
-func Udp_Rendezvous(AES_key string) (*net.UDPConn, Endpoints){
-	addr, _ := net.ResolveUDPAddr("udp", ":1691")
+func Udp_Rendezvous(AES_key string){
+	addr, _ := net.ResolveUDPAddr("udp", ":1692")
 
 	var err error
 	srv, err := net.ListenUDP("udp", addr)
@@ -40,4 +40,3 @@ func Udp_Rendezvous(AES_key string) (*net.UDPConn, Endpoints){
 		}
   	}
 }
-
