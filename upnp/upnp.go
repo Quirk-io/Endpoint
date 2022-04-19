@@ -4,6 +4,7 @@ import (
 	upnp "github.com/jcuga/go-upnp"
 	stun "github.com/quirkio/Endpoint/stun"
 	"log"
+	"strconv"
 )
 
 func GetIp() string{
@@ -22,4 +23,26 @@ func GetIp() string{
 	return ip
 }
 
-func OpenPort() 
+func OpenPort(port string) stun.Endpoint{
+	proto := "TCP"
+	ip := GetIp()
+	port_int, _ := strconv.Atoi(port)
+
+	u, uErr := upnp.Discover()
+	if uErr != nil{
+		log.Fatal(uErr)
+	}
+
+	fErr := u.Forward(uint16(port_int), "Forwarding req by Endpoint", proto) 
+	if fErr != nil{
+		log.Fatal(fErr)
+	}
+
+	endpoint := stun.Endpoint{ip, port}
+
+	return endpoint
+}
+
+func ClosePort(port string){
+	
+}
