@@ -46,6 +46,7 @@ func OpenPort(port string) stun.Endpoint{
 
 func ClosePort(port string){
 	proto := "TCP"
+	ip := GetIp()
 	port_int, _ := strconv.Atoi(port)
 
 	u, uErr := upnp.Discover()
