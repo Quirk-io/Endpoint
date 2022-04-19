@@ -38,11 +38,24 @@ func OpenPort(port string) stun.Endpoint{
 		log.Fatal(fErr)
 	}
 
+	log.Println(ip,":",port,"forwarded")
 	endpoint := stun.Endpoint{ip, port}
 
 	return endpoint
 }
 
 func ClosePort(port string){
-	
+	proto := "TCP"
+	port_int, _ := strconv.Atoi(port)
+
+	u, uErr := upnp.Discover()
+	if uErr != nil{
+		log.Fatal(uErr)
+	}
+
+	cErr := u.Clear(uint16(port_int), proto)
+	if cErr != nil{
+		log.Fatal(cErr)
+	}
+	log.Println(ip,":",port,"closed")	
 }
