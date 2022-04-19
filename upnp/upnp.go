@@ -21,3 +21,5 @@ func GetIp() string{
 
 	return ip
 }
+
+func OpenPort() 
