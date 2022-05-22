@@ -4,9 +4,10 @@ package stun
 import ("log"
 	"net"
 	"strconv"
+	"sync"
 )
 
-func Udp_Rendezvous(AES_key string){
+func Udp_Rendezvous(AES_key string, wg *sync.WaitGroup){
 	addr, _ := net.ResolveUDPAddr("udp", ":1692")
 
 	var err error
