@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	upnp "github.com/jcuga/go-upnp"
-	stun "github.com/quarkio/Endpoint/stun"
+	stun "github.com/quark-io/Endpoint/stun"
 )
 
 func GetIp() string {
