@@ -1,4 +1,4 @@
-module github.com/quirkio/Endpoint
+module github.com/quarkio/Endpoint
 
 go 1.13
 
