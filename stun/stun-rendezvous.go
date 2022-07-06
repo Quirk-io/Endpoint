@@ -1,30 +1,33 @@
-
 package stun
 
-import ("log"
+import (
+	"log"
 	"net"
 	"strconv"
 	"sync"
 )
 
-func Udp_Rendezvous(AES_key string, wg *sync.WaitGroup){
+func Udp_Rendezvous(AES_key string, wg *sync.WaitGroup) {
+	if wg != nil {
+		defer wg.Done()
+	}
 	addr, _ := net.ResolveUDPAddr("udp", ":1692")
 
 	var err error
 	srv, err := net.ListenUDP("udp", addr)
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
 	}
 	defer srv.Close()
 
 	for {
-    	buffer := make([]byte, 2048)
-		
+		buffer := make([]byte, 2048)
+
 		n, public_addr, read_err := srv.ReadFromUDP(buffer)
 		if read_err != nil {
 			log.Fatal(read_err)
 		}
-		
+
 		kenc_regmsg := buffer[:n]
 		regmsg := Dkenc_Regmsg(AES_key, string(kenc_regmsg))
 
@@ -36,8 +39,8 @@ func Udp_Rendezvous(AES_key string, wg *sync.WaitGroup){
 		kenc_endpoints := Kenc_Endpoints(AES_key, endpoints)
 
 		_, err = srv.WriteToUDP([]byte(kenc_endpoints), public_addr)
-		if err != nil{
+		if err != nil {
 			log.Fatal(err)
 		}
-  	}
+	}
 }
