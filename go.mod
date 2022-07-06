@@ -1,6 +1,6 @@
 module github.com/quark-io/Endpoint
 
-go 1.13
+go 1.17
 
 require (
 	github.com/huin/goupnp v1.0.3 // indirect
