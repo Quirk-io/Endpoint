@@ -1,27 +1,26 @@
-
 package stun
 
 import (
-	"net"
-	"log"
-	"encoding/json"
-	"encoding/base64"
 	"crypto/aes"
 	"crypto/cipher"
+	"encoding/base64"
+	"encoding/json"
+	"log"
+	"net"
 )
 
-type Endpoints struct{
-	PublicEndpoint Endpoint
+type Endpoints struct {
+	PublicEndpoint  Endpoint
 	PrivateEndpoint Endpoint
 }
 
-type Endpoint struct{
-	Ip string
+type Endpoint struct {
+	Ip   string
 	Port string
 }
 
-type RegMsg struct{
-	Msgtype string 
+type RegMsg struct {
+	Msgtype         string
 	PrivateEndpoint string
 }
 
@@ -59,28 +58,28 @@ func AES_decrypt(enc_msg string, key string) string {
 	}
 
 	nonce, enc_msg := enc_msg[:nonceSize], enc_msg[nonceSize:]
-	
+
 	msg, err := gcm.Open(nil, []byte(nonce), []byte(enc_msg), nil)
-    if err != nil {
-        log.Fatal(err)
-    }
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return string(msg)
 }
 
 func GetPrivateIp() string {
-    conn, err := net.Dial("udp", "8.8.8.8:80")
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer conn.Close()
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
 
-    localAddr := conn.LocalAddr().(*net.UDPAddr).IP
-    return localAddr.String()
+	localAddr := conn.LocalAddr().(*net.UDPAddr).IP
+	return localAddr.String()
 }
 
-func Reg() RegMsg{ //Register msg
-	privendpoint := Endpoint{GetPrivateIp(), "1691"}
+func Reg(peer_port string) RegMsg { //Register msg
+	privendpoint := Endpoint{GetPrivateIp(), peer_port}
 	jsonified_privendpoint, _ := json.Marshal(privendpoint)
 
 	regmsg := RegMsg{"reg", string(jsonified_privendpoint)}
@@ -88,21 +87,21 @@ func Reg() RegMsg{ //Register msg
 	return regmsg
 }
 
-func ImportPrivateEndpoint(jsonified_privendpoint string) Endpoint{ //From json to Endpoint
+func ImportPrivateEndpoint(jsonified_privendpoint string) Endpoint { //From json to Endpoint
 	var endpoint Endpoint
 	json.Unmarshal([]byte(jsonified_privendpoint), &endpoint)
 
 	return endpoint
 }
 
-func Kenc_Regmsg(AES_key string) string{ //Encrypting Regmsg with AES_key
-	jsonified_regmsg, _ := json.Marshal(Reg())
+func Kenc_Regmsg(peer_port, AES_key string) string { //Encrypting Regmsg with AES_key
+	jsonified_regmsg, _ := json.Marshal(Reg(peer_port))
 	kenc_regmsg := base64.StdEncoding.EncodeToString([]byte(AES_encrypt(string(jsonified_regmsg), AES_key)))
 
 	return kenc_regmsg
 }
 
-func Dkenc_Regmsg(AES_key string, kenc_regmsg string) RegMsg{
+func Dkenc_Regmsg(AES_key string, kenc_regmsg string) RegMsg {
 	b64dec_regmsg, _ := base64.StdEncoding.DecodeString(kenc_regmsg)
 	jsonified_regmsg := AES_decrypt(string(b64dec_regmsg), AES_key)
 
@@ -112,14 +111,14 @@ func Dkenc_Regmsg(AES_key string, kenc_regmsg string) RegMsg{
 	return regmsg
 }
 
-func Kenc_Endpoints(AES_key string, endpoints Endpoints) string{
+func Kenc_Endpoints(AES_key string, endpoints Endpoints) string {
 	jsonified_endpoints, _ := json.Marshal(endpoints)
 	kenc_endpoints := base64.StdEncoding.EncodeToString([]byte(AES_encrypt(string(jsonified_endpoints), AES_key)))
 
 	return kenc_endpoints
 }
 
-func Dkenc_Endpoints(AES_key string, kenc_endpoints string) Endpoints{
+func Dkenc_Endpoints(AES_key string, kenc_endpoints string) Endpoints {
 	b64dec_endpoints, _ := base64.StdEncoding.DecodeString(kenc_endpoints)
 	jsonified_endpoints := AES_decrypt(string(b64dec_endpoints), AES_key)
 
